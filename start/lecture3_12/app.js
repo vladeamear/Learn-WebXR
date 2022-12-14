@@ -164,7 +164,7 @@ class App{
     requestHitTestSource(){
         const self = this;
         
-        const session = this.renderer.sr.getSession();
+        const session = this.renderer.xr.getSession();
         
         session.requestReferenceSpace('viewer').then(function(referenceSpace) {
             session.requestHitTestSource({ space: referenceSpace })
