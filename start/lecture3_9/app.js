@@ -53,15 +53,14 @@ class App{
         this.renderer.xr.enabled = true;
         const self = this;
         let controller
-        const raycaster = new THREE.Raycaster();
 
         function onSelect() {
-            pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-	        pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+            self.pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	        self.pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
-            raycaster.setFromCamera( pointer, camera );
+            self.raycaster.setFromCamera( pointer, camera );
 
-            const intersects = raycaster.intersectObjects( scene.children );
+            const intersects = raycaster.intersectObjects( self.scene.children );
 
             if (intersects.length !== 0) {
                 intersects[0].object.material.color.set(0xff0000)
@@ -78,7 +77,7 @@ class App{
 
         }
 
-        // const btn = new ARButton(this.renderer);
+        const btn = new ARButton(this.renderer);
         controller = this.renderer.xr.getController(0);
         controller.addEventListener('select', onSelect);
         this.scene.add(controller);
