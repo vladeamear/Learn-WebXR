@@ -13,6 +13,10 @@ class App{
 		this.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 20 );
 		
 		this.scene = new THREE.Scene();
+
+        this.raycaster = new THREE.Raycaster();
+
+        this.pointer = new THREE.Vector2();
         
 		this.scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
 
@@ -50,15 +54,30 @@ class App{
         const self = this;
         let controller
 
-        function onSelect() {
-            const material = new THREE.MeshPhongMaterial({
-                color: 0xFFFFFF * Math.random()
-            });
-            const mesh = new THREE.Mesh(self.geometry, material);
-            mesh.position.set(0,0,-0.3).applyMatrix4(controller.matrixWorld);
-            mesh.quaternion.setFromRotationMatrix(controller.matrixWorld);
-            self.scene.add(mesh);
-            self.meshes.push(mesh);
+        function onSelect(event) {
+            // self.pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	        // self.pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+            self.mouse.x = +(event.targetTouches[0].pageX / window.innerWidth) * 2 +-1;
+
+            self.mouse.y = -(event.targetTouches[0].pageY / window.innerHeight) * 2 + 1;
+
+            self.raycaster.setFromCamera( pointer, camera );
+
+            const intersects = raycaster.intersectObjects( self.scene.children );
+
+            if (intersects.length !== 0) {
+                intersects[0].object.material.color.set(0xff0000)
+            } else {
+                const material = new THREE.MeshPhongMaterial({
+                    color: 0xFFFFFF * Math.random()
+                });
+                const mesh = new THREE.Mesh(self.geometry, material);
+                mesh.position.set(0,0,-0.3).applyMatrix4(controller.matrixWorld);
+                mesh.quaternion.setFromRotationMatrix(controller.matrixWorld);
+                self.scene.add(mesh);
+                self.meshes.push(mesh);
+            }
+
         }
 
         const btn = new ARButton(this.renderer);
