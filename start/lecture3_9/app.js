@@ -13,6 +13,10 @@ class App{
 		this.camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 20 );
 		
 		this.scene = new THREE.Scene();
+
+        this.raycaster = new THREE.Raycaster();
+
+        this.pointer = new THREE.Vector2();
         
 		this.scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
 
@@ -49,19 +53,32 @@ class App{
         this.renderer.xr.enabled = true;
         const self = this;
         let controller
+        const raycaster = new THREE.Raycaster();
 
         function onSelect() {
-            const material = new THREE.MeshPhongMaterial({
-                color: 0xFFFFFF * Math.random()
-            });
-            const mesh = new THREE.Mesh(self.geometry, material);
-            mesh.position.set(0,0,-0.3).applyMatrix4(controller.matrixWorld);
-            mesh.quaternion.setFromRotationMatrix(controller.matrixWorld);
-            self.scene.add(mesh);
-            self.meshes.push(mesh);
+            pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	        pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+            raycaster.setFromCamera( pointer, camera );
+
+            const intersects = raycaster.intersectObjects( scene.children );
+
+            if (intersects.length !== 0) {
+                intersects[0].object.material.color.set(0xff0000)
+            } else {
+                const material = new THREE.MeshPhongMaterial({
+                    color: 0xFFFFFF * Math.random()
+                });
+                const mesh = new THREE.Mesh(self.geometry, material);
+                mesh.position.set(0,0,-0.3).applyMatrix4(controller.matrixWorld);
+                mesh.quaternion.setFromRotationMatrix(controller.matrixWorld);
+                self.scene.add(mesh);
+                self.meshes.push(mesh);
+            }
+
         }
 
-        const btn = new ARButton(this.renderer);
+        // const btn = new ARButton(this.renderer);
         controller = this.renderer.xr.getController(0);
         controller.addEventListener('select', onSelect);
         this.scene.add(controller);
